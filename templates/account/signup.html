@@ -1,13 +1,34 @@
-{% extends '_base.html' %}
-{% load crispy_forms_tags %}
+{% extends 'components/form_base.html' %}
+{% load i18n %}
 
-{% block title %}Sign up{% endblock %}
+{% block title %}Sign Up{% endblock %}
+{% block form_title %}Sign Up{% endblock %}
 
-{% block content %}
-<h2>Sign up</h2>
-<form method="post">
-  {% csrf_token %}
-  {{ form|crispy }}
-  <button class="btn btn-success" type="submit">Sign up</button>
-</form>
-{% endblock content %}
+{% block form_action %}{% url 'account_signup' %}{% endblock %}
+
+{% block form_fields %}
+    {% include 'components/form_field.html' with 
+        field_name='email' 
+        label='Email' 
+        field_type='email' 
+        required=True 
+        field_errors=form.email.errors %}
+
+    {% include 'components/form_field.html' with 
+        field_name='password1' 
+        label='Password' 
+        field_type='password' 
+        required=True 
+        field_errors=form.password1.errors %}
+{% endblock %}
+
+{% block submit_button_text %}Sign Up{% endblock %}
+
+{% block form_footer %}
+    <div class="mt-6 text-center text-sm text-gray-600">
+        Already have an account? 
+        <a href="{% url 'account_login' %}" class="text-blue-600 hover:text-blue-500">
+            Log in here
+        </a>
+    </div>
+{% endblock %}

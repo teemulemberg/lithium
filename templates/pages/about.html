@@ -1,7 +1,41 @@
-{% extends '_base.html' %}
+{% extends 'base.html' %}
 
-{% block title %}About page{% endblock %}
+{% block title %}About Us{% endblock title %}
 
 {% block content %}
-<h1>About page</h1>
+<div class="max-w-4xl mx-auto">
+    <h1 class="text-4xl font-bold text-gray-900 mb-8">About Us</h1>
+    
+    <div class="prose lg:prose-xl">
+        <p class="mb-6 text-gray-600">
+            Welcome to Inven, where innovation meets inventory management. We're dedicated to transforming how businesses handle their inventory needs through cutting-edge technology and intuitive design.
+        </p>
+
+        <h2 class="text-2xl font-semibold text-gray-800 mt-8 mb-4">Our Mission</h2>
+        <p class="mb-6 text-gray-600">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+        </p>
+
+        <h2 class="text-2xl font-semibold text-gray-800 mt-8 mb-4">Our Vision</h2>
+        <p class="mb-6 text-gray-600">
+            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+        </p>
+
+        <h2 class="text-2xl font-semibold text-gray-800 mt-8 mb-4">Why Choose Us?</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+            <div class="p-6 bg-white rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold mb-2">Innovation</h3>
+                <p class="text-gray-600">Cutting-edge technology solutions for modern inventory challenges.</p>
+            </div>
+            <div class="p-6 bg-white rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold mb-2">Reliability</h3>
+                <p class="text-gray-600">Trusted by businesses worldwide for consistent performance.</p>
+            </div>
+            <div class="p-6 bg-white rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold mb-2">Support</h3>
+                <p class="text-gray-600">24/7 dedicated customer support for all your needs.</p>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock content %}

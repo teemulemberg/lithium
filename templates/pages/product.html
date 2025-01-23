@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+
+{% block title %}Our Product{% endblock title %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <h1 class="text-4xl font-bold text-gray-900 mb-8">File Upload</h1>
+    
+    <div class="bg-white p-8 rounded-lg shadow-md">
+        <form id="uploadForm" class="space-y-6" method="POST" action="{% url 'upload_file' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <!-- Drag and Drop Zone -->
+            <div id="dropZone" class="relative border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors">
+                <input type="file" 
+                       id="fileInput" 
+                       name="files" 
+                       multiple 
+                       class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                       accept=".csv, .xlsx, .xls">
+                
+                <div class="space-y-4">
+                    <div class="text-blue-600">
+                        <svg class="mx-auto h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                        </svg>
+                    </div>
+                    <div class="text-gray-600">
+                        <span class="font-medium">Click to upload</span> or drag and drop
+                        <p class="text-sm text-gray-500">CSV, Excel files</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- File Preview Area -->
+            <div id="previewArea" class="hidden space-y-4">
+                <h3 class="font-medium text-gray-900">Selected Files</h3>
+                <div id="fileList" class="space-y-2"></div>
+            </div>
+
+            <!-- Upload Button -->
+            <div class="flex justify-end">
+                <button type="submit" 
+                        class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+                        id="uploadButton"
+                        disabled>
+                    Upload Files
+                </button>
+            </div>
+        </form>
+
+        <!-- Progress Area -->
+        <div id="progressArea" class="hidden mt-6">
+            <div class="w-full bg-gray-200 rounded-full h-2">
+                <div id="progressBar" class="bg-blue-600 h-2 rounded-full" style="width: 0%"></div>
+            </div>
+            <p id="progressText" class="text-sm text-gray-600 mt-2 text-center">0%</p>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const previewArea = document.getElementById('previewArea');
+    const fileList = document.getElementById('fileList');
+    const uploadButton = document.getElementById('uploadButton');
+    const progressArea = document.getElementById('progressArea');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+
+    // Drag and drop handlers
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight(e) {
+        dropZone.classList.add('border-blue-500', 'bg-blue-50');
+    }
+
+    function unhighlight(e) {
+        dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+    }
+
+    // Handle dropped files
+    dropZone.addEventListener('drop', handleDrop, false);
+    fileInput.addEventListener('change', handleFileSelect, false);
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        handleFiles(files);
+    }
+
+    function handleFileSelect(e) {
+        const files = e.target.files;
+        handleFiles(files);
+    }
+
+    function handleFiles(files) {
+        previewArea.classList.remove('hidden');
+        fileList.innerHTML = '';
+        uploadButton.disabled = files.length === 0;
+
+        Array.from(files).forEach(file => {
+            const fileItem = createFilePreview(file);
+            fileList.appendChild(fileItem);
+        });
+    }
+
+    function createFilePreview(file) {
+        const div = document.createElement('div');
+        div.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-lg';
+        
+        const fileInfo = document.createElement('div');
+        fileInfo.className = 'flex items-center space-x-3';
+        
+        const fileIcon = document.createElement('div');
+        fileIcon.className = 'text-gray-500';
+        fileIcon.innerHTML = `
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+        `;
+        
+        const fileName = document.createElement('span');
+        fileName.className = 'text-sm text-gray-700';
+        fileName.textContent = file.name;
+        
+        fileInfo.appendChild(fileIcon);
+        fileInfo.appendChild(fileName);
+        div.appendChild(fileInfo);
+        
+        const fileSize = document.createElement('span');
+        fileSize.className = 'text-sm text-gray-500';
+        fileSize.textContent = formatFileSize(file.size);
+        div.appendChild(fileSize);
+        
+        return div;
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Handle form submission
+    document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        
+        progressArea.classList.remove('hidden');
+        uploadButton.disabled = true;
+
+        try {
+            const response = await fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                },
+                onUploadProgress: (progressEvent) => {
+                    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    progressBar.style.width = percentCompleted + '%';
+                    progressText.textContent = percentCompleted + '%';
+                }
+            });
+
+            if (response.ok) {
+                // Handle successful upload
+                progressText.textContent = 'Upload complete!';
+                setTimeout(() => {
+                    progressArea.classList.add('hidden');
+                    fileList.innerHTML = '';
+                    previewArea.classList.add('hidden');
+                    uploadButton.disabled = true;
+                    fileInput.value = '';
+                }, 2000);
+            } else {
+                throw new Error('Upload failed');
+            }
+        } catch (error) {
+            progressText.textContent = 'Upload failed. Please try again.';
+            progressText.classList.add('text-red-600');
+            uploadButton.disabled = false;
+        }
+    });
+});
+</script>
+{% endblock %}
+{% endblock content %} 

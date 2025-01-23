@@ -1,13 +1,36 @@
-{% extends '_base.html' %}
-{% load crispy_forms_tags %}
+{% extends 'components/form_base.html' %}
+{% load i18n %}
 
-{% block title %}Log in{% endblock %}
+{% block title %}Log In{% endblock %}
+{% block form_title %}Log In{% endblock %}
 
-{% block content %}
-<h2>Log in</h2>
-<form method="post">
-  {% csrf_token %}
-  {{ form|crispy }}
-  <button class="btn btn-success" type="submit">Log in</button>
-</form>
-{% endblock content %}
+{% block form_action %}{% url 'account_login' %}{% endblock %}
+
+{% block form_fields %}
+    {% include 'components/form_field.html' with field_name='login' label='Email' field_type='email' required=True %}
+    {% include 'components/form_field.html' with field_name='password' label='Password' field_type='password' required=True %}
+
+    <div class="flex items-center justify-between">
+        <div class="flex items-center">
+            <input type="checkbox" name="remember" id="id_remember" 
+                   class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <label for="id_remember" class="ml-2 block text-sm text-gray-700">Remember me</label>
+        </div>
+
+        <a href="{% url 'account_reset_password' %}" 
+           class="text-sm text-blue-600 hover:text-blue-500">
+            Forgot password?
+        </a>
+    </div>
+{% endblock %}
+
+{% block submit_button_text %}Log In{% endblock %}
+
+{% block form_footer %}
+    <div class="mt-6 text-center text-sm text-gray-600">
+        Don't have an account? 
+        <a href="{% url 'account_signup' %}" class="text-blue-600 hover:text-blue-500">
+            Sign up here
+        </a>
+    </div>
+{% endblock %}

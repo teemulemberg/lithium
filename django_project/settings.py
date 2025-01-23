@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -36,10 +37,14 @@ INSTALLED_APPS = [
     "crispy_forms",
     "crispy_bootstrap5",
     "debug_toolbar",
+    "encrypted_model_fields",
     # Local
-    "accounts",
+    "accounts.apps.AccountsConfig",
     "pages",
 ]
+
+# Add this after INSTALLED_APPS
+TAILWIND_APP_NAME = 'theme'
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#middleware
 MIDDLEWARE = [
@@ -200,3 +205,6 @@ ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
+
+# Generate a new key for encryption (in production, use environment variables)
+FIELD_ENCRYPTION_KEY = os.environ.get('FIELD_ENCRYPTION_KEY', 'dZ7LqXbNFTayqo_y9Z3mxsNmBj0LPVV4Qv9vXqeR6JE=')
